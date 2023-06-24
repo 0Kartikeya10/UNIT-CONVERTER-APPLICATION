@@ -1,0 +1,122 @@
+Step 1: Set up the project
+Create a new project in Android Studio and set up the necessary files and configurations.
+
+Step 2: Design the layout
+In the activity_main.xml file, add the following code to create the layout for the Unit Converter application:
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Unit Converter"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <EditText
+        android:id="@+id/inputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter a value"/>
+
+    <Spinner
+        android:id="@+id/sourceUnitSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/unit_array"/>
+
+    <Spinner
+        android:id="@+id/targetUnitSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/unit_array"/>
+
+    <Button
+        android:id="@+id/convertButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Convert"/>
+
+    <TextView
+        android:id="@+id/resultTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>
+Step 3: Implement the Unit Converter functionality
+In the MainActivity.java file, add the following code to implement the Unit Converter functionality:
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText inputEditText;
+    private Spinner sourceUnitSpinner;
+    private Spinner targetUnitSpinner;
+    private Button convertButton;
+    private TextView resultTextView;
+
+    private String[] units = {"Meter", "Kilometer", "Mile", "Foot", "Inch"};
+    private double[] conversionFactors = {1.0, 0.001, 0.000621371, 3.28084, 39.3701};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        inputEditText = findViewById(R.id.inputEditText);
+        sourceUnitSpinner = findViewById(R.id.sourceUnitSpinner);
+        targetUnitSpinner = findViewById(R.id.targetUnitSpinner);
+        convertButton = findViewById(R.id.convertButton);
+        resultTextView = findViewById(R.id.resultTextView);
+
+        ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, units);
+        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sourceUnitSpinner.setAdapter(unitAdapter);
+        targetUnitSpinner.setAdapter(unitAdapter);
+
+        convertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                convertUnits();
+            }
+        });
+    }
+
+    private void convertUnits() {
+        String inputValue = inputEditText.getText().toString().trim();
+        if (inputValue.isEmpty()) {
+            resultTextView.setText("Please enter a value.");
+            return;
+        }
+
+        double input = Double.parseDouble(inputValue);
+        int sourceUnitIndex = sourceUnitSpinner.getSelectedItemPosition();
+        int targetUnitIndex = targetUnitSpinner.getSelectedItemPosition();
+
+        double sourceValue = input * conversionFactors[sourceUnitIndex];
+        double targetValue = sourceValue / conversionFactors[targetUnitIndex];
+
+        String result = input + " " + units[sourceUnitIndex] + " is equal to " + targetValue + " " + units[targetUnitIndex];
+        resultTextView.setText(result);
+    }
+}
